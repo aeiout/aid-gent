@@ -1,0 +1,59 @@
+version: 1
+rules:
+  severe_dyspnea:
+    label: severe_dyspnea
+    patterns:
+      - "หายใจไม่อิ่ม"
+      - "หายใจไม่ออก"
+      - "หอบมาก"
+      - "แน่นหน้าอก.*หายใจ"
+      - "ริมฝีปากเขียว"
+  severe_chest_pain:
+    label: severe_chest_pain
+    patterns:
+      - "แน่นหน้าอก"
+      - "เจ็บหน้าอก"
+      - "ร้าวไปแขน"
+      - "ร้าวไปกราม"
+  seizure_unconscious:
+    label: seizure_unconscious
+    patterns:
+      - "ชัก"
+      - "หมดสติ"
+      - "เรียกไม่ตอบ"
+  neuro_stroke:
+    label: neuro_stroke
+    patterns:
+      - "พูดไม่ชัด"
+      - "ปากเบี้ยว"
+      - "แขน(ซ้าย|ขวา)?ไม่มีแรง"
+  gi_bleed:
+    label: gi_bleed
+    patterns:
+      - "อาเจียนเป็นเลือด"
+      - "ถ่ายดำ"
+      - "ไอเป็นเลือด"
+  severe_abdominal:
+    label: severe_abdominal
+    patterns:
+      - "ปวดท้องจี๊ด"
+      - "ปวดท้องรุนแรง"
+      - "กดแล้วเจ็บ"
+  anaphylaxis:
+    label: anaphylaxis
+    patterns:
+      - "ปากบวม"
+      - "ลิ้นบวม"
+      - "ผื่นทั้งตัว.*หายใจ"
+      - "จะเป็นลม"
+  infant_fever:
+    label: infant_fever
+    patterns:
+      - "เด็ก.*(เดือน|mo).*ไข้"
+      - "ทารก.*ไข้"
+  eye_emergency:
+    label: eye_emergency
+    patterns:
+      - "ตาบวม.*ปวด"
+      - "ตามัว"
+      - "เจ็บตา.*บวม"

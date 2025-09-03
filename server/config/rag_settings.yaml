@@ -1,0 +1,19 @@
+embeddings:
+  provider: openai
+  model: text-embedding-3-small
+  dimension: 1536
+
+pinecone:
+  index: aidgent-th-rag
+  metric: cosine
+  namespace: "default"
+
+search:
+  k: 5
+  mmr: true
+  min_score: 0.30   # ต่ำกว่านี้ให้ถือว่าเชื่อมโยงอ่อน
+
+chunking_guidelines:
+  target_chars: 900
+  overlap_chars: 120
+  preserve_headings: true

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Virtual env
+.venv/
+
+# Local env & secrets
+.env
+*.env
+
+# Local databases / artifacts
+aidgent.db
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# (future) frontend
+node_modules/
+dist/
+build/
+.next/

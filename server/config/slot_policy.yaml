@@ -1,0 +1,51 @@
+version: 0.2
+intents:
+  resp_upper:
+    name_th: ทางเดินหายใจทั่วไป (ไข้/ไอ/เจ็บคอ)
+    ask_order:
+      - main_symptoms
+      - duration
+      - fever_measured
+      - fever_max_c
+      - fever_method
+      - severity_overall
+      - co_symptoms
+      - risk_factors
+      - meds_allergies
+    required_slots:
+      - main_symptoms
+      - duration
+      - fever_measured
+      - severity_overall
+      - co_symptoms
+      - risk_factors
+      - meds_allergies
+    # fever_max_c / fever_method become conditionally required only if fever_measured==true
+    conditional_required:
+      - if: "fever_measured == true"
+        then: ["fever_max_c", "fever_method"]
+
+  derm_rash:
+    name_th: ผิวหนัง (ผื่น/คัน)
+    ask_order:
+      - rash_morphology
+      - rash_location_primary
+      - rash_extent
+      - associated
+      - duration
+      - suspected_triggers
+      - vulnerable_groups
+    required_slots:
+      - rash_morphology # array[str]: แดง/นูน/แห้งลอก/ตุ่มน้ำ/เป็นวง/ลามเร็วไหม
+      - rash_location_primary # enum: face|trunk|arms|legs|periorbital|genital
+      - rash_extent # enum: single_patch|multi_patch|generalized
+      - associated # object{itch,pain_burning,fever,facial_or_tongue_swelling,pus_or_weeping} booleans
+      - duration # str
+      - suspected_triggers # array[str]
+      - vulnerable_groups # object{infant,pregnant,immunosuppressed,diabetes} booleans
+    optional_slots:
+      - self_care_tried_optional # array[str]|null
+
+  emergency:
+    name_th: ฉุกเฉิน (ธงแดง)
+    required_slots: [] # โหมดฉุกเฉินไม่เก็บ slot ต่อ
