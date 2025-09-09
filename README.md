@@ -1,6 +1,6 @@
 # aid-gent
 
-ผู้ช่วยคลินิก/สุขภาพแบบโมโนรีโป รวม RAG, triage, red-flags, LLM orchestration, SOP/education
+ผู้ช่วยคลินิก/สุขภาพ รวม RAG, triage, red-flags, LLM orchestration, SOP/education
 
 - aid-gent/
   - app/ # Frontend app (empty for now)
