@@ -5,11 +5,11 @@
 - aid-gent/
   - app/ # Frontend app (empty for now)
   - server/ # FastAPI/uvicorn backend, RAG pipeline entrypoints
-  - orchestrator/ # Orchestration / workflow (empty for now)
-  - rag/ # RAG data, chunks, pipeline (empty for now)
-  - redflags/ # Clinical red-flag rules (empty for now)
-  - llm/ # Prompt templates, chains, tools (empty for now)
-  - storage/ # Local storage (vector DB, caches, temp) (empty for now)
+  - orchestrator/ # Orchestration / workflow
+  - rag/ # RAG data, chunks, pipeline
+  - redflags/ # Clinical red-flag rules
+  - llm/ # Prompt templates, chains, tools
+  - storage/ # Local storage (vector DB, caches, temp)
   - config/ # Put prompt/policy files here
   - docs/ # Internal docs
   - triage/ # Clinical triage logic/specs
