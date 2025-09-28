@@ -1,5 +1,6 @@
 import os
 import json
+import uuid
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
@@ -54,6 +55,12 @@ class ChatTurnResp(BaseModel):
     assistant_text: str
     state: Dict[str, Any]
 
+class CreateSessionReq(BaseModel):
+    intent: Optional[str] = None  # "urti" | "derm" | None
+
+class CreateSessionResp(BaseModel):
+    session_id: str
+    intent: Optional[str] = None
 # ---------- Helpers ----------
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
@@ -277,6 +284,53 @@ def transcript(session_id: str):
             .order_by(Message.created_at.asc())
             .all()
         )
+        out = []
+        for m in msgs:
+            try:
+                st = json.loads(m.state_json) if m.state_json else {}
+            except Exception:
+                st = {}
+            out.append({
+                "role": m.role,
+                "text": m.text,                 # ของเดิม (คงไว้)
+                "content_th": m.text,           # alias สำหรับ FE
+                "ts": m.created_at,             # alias สำหรับ FE
+                "state": st,                    # ของเดิม (คงไว้)
+            })
+
+        soaps = (
+            db.query(SoapSummary)
+            .filter(SoapSummary.session_id == session_id)
+            .order_by(SoapSummary.created_at.asc())
+            .all()
+        )
+        cites = (
+            db.query(Citation)
+            .filter(Citation.session_id == session_id)
+            .order_by(Citation.turn_id.asc())
+            .all()
+        )
+        return {
+            "session_id": session_id,
+            "messages": out,
+            "soap_summaries": [json.loads(s.soap_json) for s in soaps],
+            "citations": [
+                {
+                    "turn_id": c.turn_id,
+                    "doc_id": c.doc_id,
+                    "snippet_ids": c.snippet_ids.split(",") if c.snippet_ids else [],
+                }
+                for c in cites
+            ],
+        }
+
+    with SessionLocal() as db:
+        msgs = (
+            db.query(Message)
+            .filter(Message.session_id == session_id)
+            .order_by(Message.created_at.asc())
+            .all()
+        )
         out = [{"role": m.role, "text": m.text, "state": json.loads(m.state_json)} for m in msgs]
         soaps = (
             db.query(SoapSummary)
@@ -303,3 +357,18 @@ def transcript(session_id: str):
                 for c in cites
             ],
         }
+    
+@app.post("/session", response_model=CreateSessionResp)
+def create_session(req: CreateSessionReq):
+    sid = f"sess_{uuid.uuid4().hex[:12]}"
+    with SessionLocal() as db:
+        # บันทึก session meta ตามสไตล์ที่คุณใช้ใน /chat/turn
+        db.add(SessionRec(
+            id=sid,
+            created_at=now_iso(),
+            age_bucket="unknown",
+            consent_flags="{}",
+        ))
+        db.commit()
+    # intent ตอนนี้ยังไม่ได้เก็บในตาราง (ถ้า model รองรับค่อยเติมภายหลัง)
+    return {"session_id": sid, "intent": req.intent}
