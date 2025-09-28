@@ -13,6 +13,8 @@ export type ChatTurnResponse = {
 export type Transcript = {
   session_id: string;
   messages: { role: "user" | "assistant"; content_th: string; ts: string }[];
+  soap_summaries?: any[]; // from backend (array of soap_json objects)
+  citations?: any[];
 };
 
 async function handle(res: Response) {
@@ -26,7 +28,6 @@ async function handle(res: Response) {
   return res.json();
 }
 
-/** สร้าง session ใหม่ (แบ็กเอนด์ของคุณมี POST /session แล้ว) */
 export async function createSession(intent?: "urti" | "derm"): Promise<CreateSessionResponse> {
   const res = await fetch(`${API_BASE}/session`, {
     method: "POST",
@@ -36,7 +37,6 @@ export async function createSession(intent?: "urti" | "derm"): Promise<CreateSes
   return handle(res);
 }
 
-/** ส่งข้อความในแชท (สอดคล้องกับ ChatTurnReq: { session_id?, user_text }) */
 export async function postChatTurn(body: {
   session_id?: string;
   user_text: string;
@@ -49,11 +49,10 @@ export async function postChatTurn(body: {
   return handle(res);
 }
 
-/** ดึง transcript แล้ว map ให้ FE ใช้ field content_th, ts ได้แน่ ๆ */
 export async function getTranscript(id: string): Promise<Transcript> {
   const res = await fetch(`${API_BASE}/session/${id}/transcript`, { cache: "no-store" });
   const data = await handle(res);
-  const mapped: Transcript = {
+  return {
     session_id: data.session_id,
     messages: (data.messages || []).map((m: any) => ({
       role: m.role,
@@ -65,6 +64,34 @@ export async function getTranscript(id: string): Promise<Transcript> {
           ? new Date(m.ts).toISOString()
           : new Date().toISOString(),
     })),
+    soap_summaries: data.soap_summaries ?? [],
+    citations: data.citations ?? [],
   };
-  return mapped;
+}
+
+export async function getSessionServerMeta(id: string): Promise<{
+  intent?: string;
+  ended: boolean;
+  lastTs?: string;
+}> {
+  const res = await fetch(`${API_BASE}/session/${id}/transcript`, { cache: "no-store" });
+  const data = await handle(res);
+
+  const msgs: any[] = data.messages ?? [];
+  let intent: string | undefined;
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    const st = msgs[i]?.state;
+    if (st && typeof st === "object" && st.intent) {
+      intent = st.intent as string;
+      break;
+    }
+  }
+  const soapCount = (data.soap_summaries?.length ?? 0) as number;
+  const ended =
+    soapCount > 0 || (!!msgs.length && !!msgs[msgs.length - 1]?.state?.soap_ready === true);
+
+  let lastTs: string | undefined = msgs.length ? msgs[msgs.length - 1]?.ts : undefined;
+  if (lastTs && typeof lastTs !== "string") lastTs = new Date().toISOString();
+
+  return { intent, ended, lastTs };
 }

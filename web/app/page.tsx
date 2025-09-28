@@ -9,7 +9,7 @@ export default function HomePage() {
   async function startNewChat() {
     try {
       // กำหนด intent เริ่มต้นได้ (เดโม่: urti) หรือส่งว่างๆ ก็ได้
-      const res = await createSession("urti");
+      const res = await createSession();
       const now = new Date().toISOString();
       addSession({
         id: res.session_id,

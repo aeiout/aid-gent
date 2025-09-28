@@ -46,3 +46,11 @@ export function touchSession(id: string) {
     write(list);
   }
 }
+
+export function updateSession(id: string, patch: Partial<SessionMeta>) {
+  const list = read();
+  const i = list.findIndex((s) => s.id === id);
+  if (i < 0) return;
+  list[i] = { ...list[i], ...patch };
+  write(list);
+}
